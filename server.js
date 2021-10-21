@@ -18,7 +18,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.get("/messages", (req, res) => {
-  res.send(messages);
   Message.find({}, (err, messages) => {
     res.send(messages);
   });
