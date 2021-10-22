@@ -5,6 +5,7 @@ var app = express();
 var http = require("http").Server(app);
 var io = require("socket.io")(http);
 var mongoose = require("mongoose");
+const { request } = require("https");
 
 mongoose.Promise = Promise;
 
@@ -26,26 +27,28 @@ app.get("/messages", (req, res) => {
 });
 
 app.post("/messages", async (req, res) => {
-  var message = new Message(req.body);
+  try {
+    var message = new Message(req.body);
 
-  var savedMessage = await message.save();
+    var savedMessage = await message.save();
 
-  console.log("saved");
+    console.log("saved");
 
-  var censored = await Message.findOne({ message: "badword" });
+    var censored = await Message.findOne({ message: "badword" });
 
-  if (censored) {
-    await Message.remove({ _id: censored.id });
-  } else {
-    io.emit("message", req.body);
+    if (censored) {
+      await Message.remove({ _id: censored.id });
+    } else {
+      io.emit("message", req.body);
+    }
+
+    res.sendStatus(200);
+  } catch (error) {
+    res.sendStatus(500);
+    return console.log(error);
+  } finally {
+    console.log("message post called");
   }
-
-  res.sendStatus(200);
-
-  // .catch((err) => {
-  //   res.sendStatus(500);
-  //   return console.log(err);
-  // });
 });
 
 io.on("connection", (socket) => {
@@ -69,4 +72,16 @@ var server = http.listen(3000, () => {
 // async MyFunction() {
 //   let list = await GetMessages();
 //   console.log(list)
+// }
+
+// MyFunction(){
+//   request((result, err) => console.log(result, err))
+// }
+// async MyFunction(){
+//   try{
+// let result = await request();
+// console.log(result)
+//   } catch (error){
+// console.log(error)
+//   }
 // }
