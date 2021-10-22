@@ -26,6 +26,13 @@ app.get("/messages", (req, res) => {
   });
 });
 
+app.get("/messages/:user", (req, res) => {
+  var user = req.params.user;
+  Message.find({ name: user }, (err, messages) => {
+    res.send(messages);
+  });
+});
+
 app.post("/messages", async (req, res) => {
   try {
     var message = new Message(req.body);
@@ -62,26 +69,3 @@ mongoose.connect(dbUrl, (err) => {
 var server = http.listen(3000, () => {
   console.log("server is listening on port", server.address().port);
 });
-
-// MyFunction(){
-//   GetMessages((list) => {
-//     console.log(list);
-//   })
-// }
-
-// async MyFunction() {
-//   let list = await GetMessages();
-//   console.log(list)
-// }
-
-// MyFunction(){
-//   request((result, err) => console.log(result, err))
-// }
-// async MyFunction(){
-//   try{
-// let result = await request();
-// console.log(result)
-//   } catch (error){
-// console.log(error)
-//   }
-// }

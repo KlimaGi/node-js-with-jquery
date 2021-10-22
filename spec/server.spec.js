@@ -21,3 +21,27 @@ describe("get messages", () => {
     });
   });
 });
+
+describe("get message from user", () => {
+  it("should return 200 Ok", (done) => {
+    request.get("http://localhost:3000/messages/tim", (err, res) => {
+      expect(res.statusCode).toEqual(200);
+      done();
+    });
+  });
+  it("name should be tim", (done) => {
+    request.get("http://localhost:3000/messages/tim", (err, res) => {
+      expect(JSON.parse(res.body)[0].name).toEqual("tim");
+      done();
+    });
+  });
+});
+
+describe("another example", () => {
+  it("should multiplay 2 by 6", () => {
+    expect(myFunction(2, 6)).toBe(12);
+  });
+});
+function myFunction(a, b) {
+  return a * b;
+}
