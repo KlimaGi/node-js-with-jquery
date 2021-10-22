@@ -25,28 +25,27 @@ app.get("/messages", (req, res) => {
   });
 });
 
-app.post("/messages", (req, res) => {
+app.post("/messages", async (req, res) => {
   var message = new Message(req.body);
 
-  message
-    .save()
-    .then(() => {
-      console.log("saved");
-      return Message.findOne({ message: "badword" });
-    })
-    .then((censored) => {
-      if (censored) {
-        console.log("censored words found", censored);
-        return Message.remove({ _id: censored.id });
-      }
+  var savedMessage = await message.save();
 
-      io.emit("message", req.body);
-      res.sendStatus(200);
-    })
-    .catch((err) => {
-      res.sendStatus(500);
-      return console.log(err);
-    });
+  console.log("saved");
+
+  var censored = await Message.findOne({ message: "badword" });
+
+  if (censored) {
+    await Message.remove({ _id: censored.id });
+  } else {
+    io.emit("message", req.body);
+  }
+
+  res.sendStatus(200);
+
+  // .catch((err) => {
+  //   res.sendStatus(500);
+  //   return console.log(err);
+  // });
 });
 
 io.on("connection", (socket) => {
@@ -60,3 +59,14 @@ mongoose.connect(dbUrl, (err) => {
 var server = http.listen(3000, () => {
   console.log("server is listening on port", server.address().port);
 });
+
+// MyFunction(){
+//   GetMessages((list) => {
+//     console.log(list);
+//   })
+// }
+
+// async MyFunction() {
+//   let list = await GetMessages();
+//   console.log(list)
+// }
